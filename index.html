@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Cadastro de Transporte Escolar</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(135deg,#f0f4ff,#e8f0ff);
+}
+
+.container{
+max-width:600px;
+margin:auto;
+background:white;
+margin-top:20px;
+border-radius:12px;
+box-shadow:0 6px 20px rgba(0,0,0,0.2);
+overflow:hidden;
+}
+
+.header{
+text-align:center;
+padding:25px;
+background:white;
+border-bottom:1px solid #ddd;
+}
+
+.logo{
+width:120px;
+padding:10px;
+border-radius:10px;
+box-shadow:0 4px 12px rgba(0,0,0,0.15);
+}
+
+.title{
+font-size:22px;
+margin-top:10px;
+font-weight:bold;
+color:#333;
+}
+
+.content{
+padding:25px;
+}
+
+.section-title{
+font-size:17px;
+font-weight:bold;
+margin-top:15px;
+margin-bottom:8px;
+color:#2c3e50;
+}
+
+label{
+font-weight:bold;
+font-size:14px;
+display:block;
+margin-top:10px;
+}
+
+input,select{
+width:100%;
+padding:12px;
+border-radius:6px;
+border:1px solid #ccc;
+margin-top:5px;
+font-size:15px;
+}
+
+input:focus,select:focus{
+border-color:#2b7cff;
+outline:none;
+}
+
+.info{
+background:#fff8e1;
+padding:10px;
+border-radius:6px;
+font-size:14px;
+margin-bottom:15px;
+border:1px solid #ffe082;
+}
+
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:6px;
+font-size:16px;
+cursor:pointer;
+margin-top:12px;
+}
+
+.btn-gps{
+background:#f39c12;
+color:white;
+}
+
+.btn-enviar{
+background:#27ae60;
+color:white;
+font-weight:bold;
+}
+
+.msg{
+text-align:center;
+margin-top:15px;
+font-weight:bold;
+color:green;
+}
+
+footer{
+text-align:center;
+font-size:13px;
+padding:15px;
+color:#555;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<img src="logo.png" class="logo">
+
+<div class="title">
+CADASTRO DE TRANSPORTE ESCOLAR
+</div>
+
+</div>
+
+<div class="content">
+
+<div class="info">
+Clique em <b>CAPTURAR LOCALIZAÇÃO</b>, aguarde cerca de 5 segundos e depois clique em <b>ENVIAR</b>.
+</div>
+
+<div class="section-title">Responsável</div>
+
+<label>Nome do Responsável</label>
+<input id="responsavel">
+
+<label>Fazenda / Sítio / Chácara</label>
+<input id="endereco">
+
+<div class="section-title">Aluno</div>
+
+<label>Nome do Aluno</label>
+<input id="aluno">
+
+<label>Escola</label>
+
+<select id="escola">
+
+<option>E.E ARTUR ANTUNES MACIEL</option>
+<option>CEM Dr. GUILHERME</option>
+<option>CEM PROFESSOR ORLANDO PEREIRA</option>
+<option>EMR OSVALDO CRUZ</option>
+<option>EMR EUCLIDES DA CUNHA</option>
+<option>EMR VINICIOS DE MORAIS</option>
+<option>EE. ANTONIO FRANCISCO LISBOA</option>
+<option>ANEXA RIO PRETO</option>
+<option>ALVARES DE AZEVEDO</option>
+<option>CORA CORALINA</option>
+<option>IFMT</option>
+
+</select>
+
+<label>Ano Escolar</label>
+
+<select id="ano">
+
+<option>PRÉ I</option>
+<option>PRÉ II</option>
+<option>1º ANO</option>
+<option>2º ANO</option>
+<option>3º ANO</option>
+<option>4º ANO</option>
+<option>5º ANO</option>
+<option>6º ANO</option>
+<option>7º ANO</option>
+<option>8º ANO</option>
+<option>9º ANO</option>
+<option>1º ANO ENSINO MÉDIO</option>
+<option>2º ANO ENSINO MÉDIO</option>
+<option>3º ANO ENSINO MÉDIO</option>
+
+</select>
+
+<label>Rota</label>
+
+<select id="rota">
+
+<option>ROTA 08/07/LISBOA</option>
+<option>ROTA 09/07/LISBOA</option>
+<option>ROTA FLOR DA SERRA/LISBOA</option>
+<option>ROTA LINHA J/RIO PRETO/URBANO</option>
+<option>ROTA 01/04/EUCLIDES</option>
+<option>ROTA 01/04/LISBOA</option>
+<option>ROTA 01/21/TERRA ROXA</option>
+<option>ROTA 04/G/EUCLIDES</option>
+<option>ROTA 05/CAIABI/LISBOA</option>
+<option>ROTA 06/TODOS OS SANTOS/LISBOA</option>
+
+</select>
+
+<button class="btn-gps" onclick="gps()">📍 CAPTURAR LOCALIZAÇÃO</button>
+
+<button class="btn-enviar" onclick="enviar()">✅ ENVIAR REGISTRO</button>
+
+<div class="msg" id="msg"></div>
+
+</div>
+
+<footer>
+Desenvolvido pelo Departamento de Tecnologia da SME
+</footer>
+
+</div>
+
+<script>
+
+const supabase = supabase.createClient(
+"https://hqefobmvtojrwyoqgzak.supabase.co",
+"sb_publishable_graMCVLAAM5yDapKLKrAhw_JXX0xvlZ"
+)
+
+let lat=""
+let lon=""
+
+function gps(){
+
+navigator.geolocation.getCurrentPosition(pos=>{
+
+lat=pos.coords.latitude
+lon=pos.coords.longitude
+
+alert("Localização capturada!")
+
+})
+
+}
+
+async function enviar(){
+
+const responsavel=document.getElementById("responsavel").value
+const endereco=document.getElementById("endereco").value
+const aluno=document.getElementById("aluno").value
+const escola=document.getElementById("escola").value
+const ano=document.getElementById("ano").value
+const rota=document.getElementById("rota").value
+
+const {error}=await supabase
+.from("cadastro_transporte")
+.insert([{
+
+responsavel,
+endereco,
+aluno,
+escola,
+ano,
+rota,
+latitude:lat,
+longitude:lon
+
+}])
+
+if(error){
+
+alert("Erro ao enviar")
+
+}else{
+
+document.getElementById("msg").innerHTML="Registro enviado com sucesso!"
+
+}
+
+}
+
+</script>
+
+</body>
+</html>

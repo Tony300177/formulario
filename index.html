@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Cadastro Transporte Escolar</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:url(https://images.unsplash.com/photo-1509228468518-180dd4864904);
+background-size:cover;
+}
+
+.box{
+background:white;
+margin:10px;
+padding:20px;
+border-radius:10px;
+}
+
+h1{
+text-align:center;
+}
+
+input,select,button{
+
+width:100%;
+padding:12px;
+margin-top:10px;
+font-size:16px;
+
+}
+
+button{
+background:#0077ff;
+color:white;
+border:none;
+}
+
+footer{
+text-align:center;
+margin-top:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h1>CADASTRO DE TRANSPORTE ESCOLAR</h1>
+
+<p><b>Clique em CAPTURAR LOCALIZAÇÃO e aguarde 5 segundos antes de enviar.</b></p>
+
+<h3>Responsável</h3>
+
+<input id="responsavel" placeholder="Nome do responsável">
+
+<input id="endereco" placeholder="Fazenda / Sítio / Chácara">
+
+<h3>Aluno</h3>
+
+<input id="aluno" placeholder="Nome do aluno">
+
+<select id="escola">
+
+<option>E.E ARTUR ANTUNES MACIEL</option>
+<option>CEM Dr. GUILHERME</option>
+<option>CEM PROFESSOR ORLANDO PEREIRA</option>
+<option>EMR OSVALDO CRUZ</option>
+<option>EMR EUCLIDES DA CUNHA</option>
+<option>EMR VINICIOS DE MORAIS</option>
+<option>EE. ANTONIO FRANCISCO LISBOA</option>
+<option>ANEXA RIO PRETO</option>
+<option>ALVARES DE AZEVEDO</option>
+<option>CORA CORALINA</option>
+<option>IFMT</option>
+
+</select>
+
+<select id="ano">
+
+<option>PRÉ I</option>
+<option>PRÉ II</option>
+<option>1º ANO</option>
+<option>2º ANO</option>
+<option>3º ANO</option>
+<option>4º ANO</option>
+<option>5º ANO</option>
+<option>6º ANO</option>
+<option>7º ANO</option>
+<option>8º ANO</option>
+<option>9º ANO</option>
+<option>1º ANO ENSINO MÉDIO</option>
+<option>2º ANO ENSINO MÉDIO</option>
+<option>3º ANO ENSINO MÉDIO</option>
+
+</select>
+
+<select id="rota">
+
+<option>ROTA 08/07/LISBOA</option>
+<option>ROTA 09/07/LISBOA</option>
+<option>ROTA FLOR DA SERRA/LISBOA</option>
+<option>ROTA LINHA J/RIO PRETO/URBANO</option>
+<option>ROTA 01/04/EUCLIDES</option>
+<option>ROTA 01/04/LISBOA</option>
+<option>ROTA 01/21/TERRA ROXA</option>
+
+</select>
+
+<button onclick="gps()">CAPTURAR LOCALIZAÇÃO</button>
+
+<button onclick="enviar()">ENVIAR</button>
+
+<p id="msg"></p>
+
+</div>
+
+<footer>
+
+Desenvolvido pelo Departamento de Tecnologia da SME
+
+</footer>
+
+<script>
+
+const supabase = supabase.createClient(
+"https://hqefobmvtojrwyoqgzak.supabase.co",
+"sb_publishable_graMCVLAAM5yDapKLKrAhw_JXX0xvlZ"
+)
+
+let lat=""
+let lon=""
+
+function gps(){
+
+navigator.geolocation.getCurrentPosition(pos=>{
+
+lat=pos.coords.latitude
+lon=pos.coords.longitude
+
+alert("Localização capturada!")
+
+})
+
+}
+
+async function enviar(){
+
+const responsavel=document.getElementById("responsavel").value
+const endereco=document.getElementById("endereco").value
+const aluno=document.getElementById("aluno").value
+const escola=document.getElementById("escola").value
+const ano=document.getElementById("ano").value
+const rota=document.getElementById("rota").value
+
+const {error}=await supabase
+.from("cadastro_transporte")
+.insert([{
+
+responsavel,
+endereco,
+aluno,
+escola,
+ano,
+rota,
+latitude:lat,
+longitude:lon
+
+}])
+
+if(error){
+
+alert("Erro ao enviar")
+
+}else{
+
+document.getElementById("msg").innerText="Registro enviado com sucesso!"
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
